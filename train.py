@@ -46,7 +46,7 @@ torch.cuda.manual_seed_all(opt.seed)
 #DATASET
 transforms = dataset.get_transforms(opt.size)
 dataloaders = dataset.get(root = opt.root, dataset = opt.dataset, transforms = transforms, batch_size = opt.batch_size)
-opt.num_classes = 10
+opt.num_classes = 10 # Thats a problem
 
 
 #ARCHITECTURE
@@ -179,3 +179,4 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
 #TODO: Logging
 #TODO: Create Graph
 #TODO: wandb_alerts
+#TODO: Dynamic num classes
