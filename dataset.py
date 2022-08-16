@@ -1,21 +1,19 @@
 import os
-import numpy as np
+import cv2
 import pandas as pd
 import albumentations as A
 
-from PIL import Image
 from albumentations import pytorch
 from torch.utils.data import Dataset, DataLoader
-from torchvision.datasets import CIFAR10, CIFAR100
+from torchvision import datasets
 
 
 #
 class CustomDataset(Dataset):
 
-
-    def __init__(self, data_dir, dataset, transform, train = True):
+    def __init__(self, root, dataset, transform, train = True):
         
-        path = os.path.join(data_dir, dataset)
+        path = os.path.join(root, dataset)
 
         csv = 'train.csv' if train else 'test.csv'
 
@@ -34,11 +32,42 @@ class CustomDataset(Dataset):
             img_path = os.path.join(self.data_dir, self.data.iloc[idx, 0])
             label_name = self.data.iloc[idx, 1]
             # X
-            img = Image.open(img_path)
-            image = self.transform(image = np.array(img))["image"]            
+            image = cv2.imread(img_path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            image = self.transform(image = image)["image"]            
             # Y
             label = self.classes.index(label_name)
             return image, label
+
+
+#
+class CIFAR10(datasets.CIFAR10):
+    def __init__(self, root, train, download, transform):
+        super().__init__(root=root, train=train, download=download, transform=transform)
+
+    def __getitem__(self, index):
+        image, label = self.data[index], self.targets[index]
+
+        if self.transform is not None:
+            transformed = self.transform(image=image)
+            image = transformed["image"]
+
+        return image, label
+
+
+#
+class CIFAR100(datasets.CIFAR100):
+    def __init__(self, root, train, download, transform):
+        super().__init__(root=root, train=train, download=download, transform=transform)
+
+    def __getitem__(self, index):
+        image, label = self.data[index], self.targets[index]
+
+        if self.transform is not None:
+            transformed = self.transform(image=image)
+            image = transformed["image"]
+
+        return image, label
 
 
 #
@@ -47,9 +76,10 @@ def get_transforms(size):
     # Different Archs?
     mean_std = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
 
+    
     train_tr = A.Compose(
         [
-            #A.Resize(cfg.resize, cfg.resize),
+            #A.Resize(size, size),
             A.RandomResizedCrop(size, size),
             A.HorizontalFlip(0.5),
             A.ImageCompression(quality_lower = 50, quality_upper = 100),
