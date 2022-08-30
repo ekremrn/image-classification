@@ -11,7 +11,7 @@ def get():
 
     parser.add_argument('--epoch', default = 50, type = int, help = 'Epoch')
     parser.add_argument('--size', default = 32, type = int, help = 'Input image size')
-    parser.add_argument('--batch_size', default = 64, type = int, help = 'Batch size')
+    parser.add_argument('--batch_size', default = 264, type = int, help = 'Batch size')
 
     parser.add_argument('--aug_mode', default = "min", type = str, help = 'Augemntation modes: min, big')
 
@@ -28,7 +28,7 @@ def get():
 
     parser.add_argument('--device', default = "cuda", type = str, help = 'device: cuda or cpu')
     parser.add_argument('--seed', default = 42, type = int, help = 'seed')
-    parser.add_argument('--version', default = "0.0", type = str, help = 'model version')
+    parser.add_argument('--version', default = "", type = str, help = 'model version')
 
     return parser.parse_args()
 

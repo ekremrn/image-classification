@@ -30,7 +30,7 @@ opt = parameters.get()
 
 #LOG
 model_name = "ds-{}_md-{}_in-{}".format(opt.dataset, opt.arch, opt.size)
-if opt.version != "0.0": model_name += "_v-{}".format(opt.version)
+if opt.version: model_name += "_v-{}".format(opt.version)
 
 if opt.wandb_entity: wandb.init(entity = opt.wandb_entity, project = opt.dataset, config = opt, name = model_name)
 
@@ -58,9 +58,9 @@ torch.cuda.manual_seed_all(opt.seed)
 
 
 #DATASET
-transforms = dataset.get_transforms(opt.size)
+transforms = dataset.get_transforms(opt.size, aug_mode = opt.aug_mode)
 dataloaders = dataset.get(root = opt.root, dataset = opt.dataset, transforms = transforms, batch_size = opt.batch_size)
-opt.num_classes = 10 # Thats a problem
+opt.num_classes = dataloaders['num_classes']
 
 
 #ARCHITECTURE
@@ -79,7 +79,7 @@ if opt.optim == 'adam':
     optimizer = optim.Adam(model.parameters(), lr = opt.lr)
 elif opt.optim == 'sgd':
     optimizer = optim.SGD(model.parameters(), lr = opt.lr, momentum = opt.momentum)
-elif opt.optim == 'sam':
+elif opt.optim == 'sam': # Does not work ??
     base_optimizer = optim.SGD
     optimizer = SAM(model.parameters(), base_optimizer, opt.lr, momentum = opt.momentum)
 else:
