@@ -16,7 +16,7 @@ def get():
     parser.add_argument('--aug_mode', default = "min", type = str, help = 'Augemntation modes: min, big')
 
     parser.add_argument('--arch', default = "resnet50", type = str, help = 'Could be used all the models in timm')
-    parser.add_argument('--not_pretrained', action = 'store_true', help = 'Flag. If set, no ImageNet pretraining is used to initialize the network.')
+    parser.add_argument('--not_pretrained', action = 'store_false', help = 'Flag. If set, no ImageNet pretraining is used to initialize the network.')
 
     parser.add_argument('--optim', default = "sgd", type = str, help = 'Optimization method to use')
     parser.add_argument('--lr', default = 0.01, type = float, help = 'learning rate')
