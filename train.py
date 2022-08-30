@@ -30,9 +30,19 @@ opt = parameters.get()
 
 #LOG
 model_name = "ds-{}_md-{}_in-{}_v-{}".format(opt.dataset, opt.arch, opt.size, opt.version)
+
 if opt.wandb_entity: wandb.init(entity = opt.wandb_entity, project = opt.dataset, config = opt, name = model_name)
+
 opt.save_path = os.path.join(opt.save_path, model_name)
 if not os.path.isdir(opt.save_path): os.makedirs(opt.save_path)
+
+LOGFILE = os.path.join(opt.save_path, "console.log")
+FORMATTER = '%(asctime)s | %(levelname)s | %(message)s'
+FILEHANDLER = logging.FileHandler(LOGFILE)
+logging.basicConfig(level = logging.DEBUG, 
+                    format = FORMATTER, 
+                    handlers = [FILEHANDLER])
+
 
 #SEED
 torch.backends.cudnn.deterministic = True
@@ -121,8 +131,7 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
     train_loss.append(running_loss / total_train_step)
     
     ## Train Log
-    logging.info("train loss: {:.4f}, train acc: {:.4f}".format(np.mean(train_loss), train_acc[-1]))
-    print("train loss: {:.4f}, train acc: {:.4f}".format(np.mean(train_loss), train_acc[-1]))
+    logging.info("Epoch: {}: train loss: {:.4f}, train acc: {:.4f}".format(i+1, np.mean(train_loss), train_acc[-1]))
     if opt.wandb_entity:
         wandb.log({
                     "train_loss" : np.mean(train_loss),
@@ -157,7 +166,6 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
 
         ## Test Log
         logging.info("train loss: {:.4f}, train acc: {:.4f}\n".format(np.mean(val_loss), val_acc[-1]))
-        print("train loss: {:.4f}, train acc: {:.4f}\n".format(np.mean(val_loss), val_acc[-1]))
         if opt.wandb_entity:
             wandb.log({
                         "valid_loss" : np.mean(val_loss),
@@ -169,7 +177,7 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
         if network_learned:
             valid_loss_min = running_loss
             torch.save(model.state_dict(), os.path.join(opt.save_path, 'best.pt'))
-            logging.info('Detected network improvement')
+            logging.info('Detected network improvement new model saved')
 
         torch.save(model.state_dict(), os.path.join(opt.save_path, 'last.pt'))
 
