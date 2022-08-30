@@ -22,24 +22,28 @@ import architecture
 ##LOG
 import wandb
 import logging
-
+from utils import graph_loss_acc
 
 #INPUT ARGUMENTS
 opt = parameters.get()
 
 
 #LOG
-model_name = "ds-{}_md-{}_in-{}_v-{}".format(opt.dataset, opt.arch, opt.size, opt.version)
+model_name = "ds-{}_md-{}_in-{}".format(opt.dataset, opt.arch, opt.size)
+if opt.version != "0.0": model_name += "_v-{}".format(opt.version)
 
 if opt.wandb_entity: wandb.init(entity = opt.wandb_entity, project = opt.dataset, config = opt, name = model_name)
 
 opt.save_path = os.path.join(opt.save_path, model_name)
 if not os.path.isdir(opt.save_path): os.makedirs(opt.save_path)
 
+opt.train_graph_path = os.path.join(opt.save_path, "train_graph.png")
+opt.valid_graph_path = os.path.join(opt.save_path, "valid_graph.png")
+
 LOGFILE = os.path.join(opt.save_path, "console.log")
 FORMATTER = '%(asctime)s | %(levelname)s | %(message)s'
 FILEHANDLER = logging.FileHandler(LOGFILE)
-logging.basicConfig(level = logging.DEBUG, 
+logging.basicConfig(level = logging.INFO, 
                     format = FORMATTER, 
                     handlers = [FILEHANDLER])
 
@@ -137,7 +141,7 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
                     "train_loss" : np.mean(train_loss),
                     "train_acc"  : train_acc[-1],
                   })
-
+    graph_loss_acc(epoch+1, train_loss, train_acc, opt.train_graph_path)
 
     ## Test Loop
     running_loss, correct, total = 0.0, 0, 0
@@ -165,12 +169,13 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
         val_loss.append(running_loss / total_test_step)
 
         ## Test Log
-        logging.info("Epoch: {}: valid loss: {:.4f}, valid acc: {:.4f}\n".format(epoch + 1, np.mean(val_loss), val_acc[-1]))
+        logging.info("Epoch: {}: valid loss: {:.4f}, valid acc: {:.4f}".format(epoch + 1, np.mean(val_loss), val_acc[-1]))
         if opt.wandb_entity:
             wandb.log({
                         "valid_loss" : np.mean(val_loss),
                         "valid_acc"  : val_acc[-1],
                     })
+        graph_loss_acc(epoch+1, val_loss, val_acc, opt.valid_graph_path)
 
         ## Save Models
         network_learned = running_loss < valid_loss_min
@@ -184,7 +189,4 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
     if opt.scheduler != "none": scheduler.step()
 
 
-#TODO: Logging
-#TODO: Create Graph
-#TODO: wandb_alerts
 #TODO: Dynamic num classes
