@@ -1,16 +1,7 @@
 python3 train.py --root data \
                  --dataset CIFAR100 \
                  --save_path results \
-                 --epoch 20 \
-                 --size 32 \
-                 --batch_size 64 \
-                 --aug_mode min \
-                 --arch resnet18
-
-python3 train.py --root data \
-                 --dataset CIFAR100 \
-                 --save_path results \
-                 --epoch 20 \
+                 --epoch 25 \
                  --size 32 \
                  --batch_size 64 \
                  --aug_mode min \
@@ -20,19 +11,8 @@ python3 train.py --root data \
 python3 train.py --root data \
                  --dataset CIFAR100 \
                  --save_path results \
-                 --epoch 20 \
+                 --epoch 25 \
                  --size 32 \
                  --batch_size 64 \
                  --aug_mode big \
                  --arch resnet50
-                 
-
-python3 train.py --root data \
-                 --dataset CIFAR100 \
-                 --save_path results \
-                 --epoch 20 \
-                 --size 32 \
-                 --batch_size 64 \
-                 --aug_mode big \
-                 --arch resnet50
-                 
