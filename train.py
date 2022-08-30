@@ -131,7 +131,7 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
     train_loss.append(running_loss / total_train_step)
     
     ## Train Log
-    logging.info("Epoch: {}: train loss: {:.4f}, train acc: {:.4f}".format(i+1, np.mean(train_loss), train_acc[-1]))
+    logging.info("Epoch: {}: train loss: {:.4f}, train acc: {:.4f}".format(epoch + 1, np.mean(train_loss), train_acc[-1]))
     if opt.wandb_entity:
         wandb.log({
                     "train_loss" : np.mean(train_loss),
@@ -165,7 +165,7 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
         val_loss.append(running_loss / total_test_step)
 
         ## Test Log
-        logging.info("train loss: {:.4f}, train acc: {:.4f}\n".format(np.mean(val_loss), val_acc[-1]))
+        logging.info("Epoch: {}: valid loss: {:.4f}, valid acc: {:.4f}\n".format(epoch + 1, np.mean(val_loss), val_acc[-1]))
         if opt.wandb_entity:
             wandb.log({
                         "valid_loss" : np.mean(val_loss),
