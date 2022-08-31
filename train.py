@@ -22,7 +22,7 @@ import architecture
 ##LOG
 import wandb
 import logging
-from utils import graph_loss_acc
+from utils import graph_loss_acc, simple_graph
 
 #INPUT ARGUMENTS
 opt = parameters.get()
@@ -40,6 +40,7 @@ if not os.path.isdir(opt.save_path): os.makedirs(opt.save_path)
 
 opt.train_graph_path = os.path.join(opt.save_path, "train_graph.png")
 opt.valid_graph_path = os.path.join(opt.save_path, "valid_graph.png")
+opt.lr_graph_path    = os.path.join(opt.save_path, "lr_graph.png")
 
 LOGFILE = os.path.join(opt.save_path, "console.log")
 FORMATTER = '%(asctime)s | %(levelname)s | %(message)s'
@@ -89,7 +90,7 @@ else:
 
 ##SCHEDULER
 if opt.scheduler != "none":
-    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones = [1000], gamma = 0.3)
+    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones = [5, 10, 20, 30, 40], gamma = 0.3)
 
 
 #TRAIN
@@ -98,6 +99,7 @@ best_valid_loss = 0
 valid_loss_min = np.Inf
 
 train_loss, train_acc, val_loss, val_acc = [], [], [], []
+learning_rate = []
 
 total_train_step = len(dataloaders['training'])
 total_test_step  = len(dataloaders['validation'])
@@ -135,15 +137,18 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
 
     train_acc.append(100 * correct / total)
     train_loss.append(running_loss / total_train_step)
-    
+    learning_rate.append(optimizer.param_groups[0]["lr"])
+
     ## Train Log
     logging.info("Epoch: {}: train loss: {:.4f}, train acc: {:.4f}".format(epoch + 1, np.mean(train_loss), train_acc[-1]))
     if opt.wandb_entity:
         wandb.log({
                     "train_loss" : np.mean(train_loss),
                     "train_acc"  : train_acc[-1],
+                    "learning rate" : optimizer.param_groups[0]["lr"]
                   })
     graph_loss_acc(epoch+1, train_loss, train_acc, opt.train_graph_path)
+    simple_graph(epoch+1, learning_rate, x_label = "Epoch", y_label = "LR", save_img = opt.lr_graph_path)
 
     ## Test Loop
     running_loss, correct, total = 0.0, 0, 0
