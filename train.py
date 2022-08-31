@@ -43,9 +43,10 @@ opt.valid_graph_path = os.path.join(opt.save_path, "valid_graph.png")
 LOGFILE = os.path.join(opt.save_path, "console.log")
 FORMATTER = '%(asctime)s | %(levelname)s | %(message)s'
 FILEHANDLER = logging.FileHandler(LOGFILE)
+STDOUTHANDLER = logging.StreamHandler()
 logging.basicConfig(level = logging.INFO, 
                     format = FORMATTER, 
-                    handlers = [FILEHANDLER])
+                    handlers = [FILEHANDLER, STDOUTHANDLER])
 
 
 #SEED
@@ -169,7 +170,7 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
         val_loss.append(running_loss / total_test_step)
 
         ## Test Log
-        logging.info("Epoch: {}: valid loss: {:.4f}, valid acc: {:.4f}".format(epoch + 1, np.mean(val_loss), val_acc[-1]))
+        logging.info("valid loss: {:.4f}, valid acc: {:.4f}\n".format(np.mean(val_loss), val_acc[-1]))
         if opt.wandb_entity:
             wandb.log({
                         "valid_loss" : np.mean(val_loss),
@@ -182,11 +183,10 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
         if network_learned:
             valid_loss_min = running_loss
             torch.save(model.state_dict(), os.path.join(opt.save_path, 'best.pt'))
-            logging.info('Detected network improvement new model saved')
+            logging.info('Detected network improvement new model saved\n')
 
         torch.save(model.state_dict(), os.path.join(opt.save_path, 'last.pt'))
 
     if opt.scheduler != "none": scheduler.step()
 
 
-#TODO: Dynamic num classes
