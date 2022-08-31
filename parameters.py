@@ -23,6 +23,7 @@ def get():
     parser.add_argument('--momentum', default = 0.9, type = float, help = 'momentum')
 
     parser.add_argument('--scheduler', default = "step", type = str, help = 'Optimization method to use')
+    parser.add_argument('--lr_milestones', default = [10, 20, 30, 40], type = int, nargs = '+', help = 'lr milestones')
 
     parser.add_argument('--wandb_entity', default = "", type = str, help = 'keep it empty if wont use')
 

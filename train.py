@@ -90,7 +90,7 @@ else:
 
 ##SCHEDULER
 if opt.scheduler != "none":
-    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones = [5, 10, 20, 30, 40], gamma = 0.3)
+    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones = opt.lr_milestones, gamma = 0.3)
 
 
 #TRAIN
