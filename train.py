@@ -30,6 +30,7 @@ opt = parameters.get()
 
 #LOG
 model_name = "ds-{}_md-{}_in-{}".format(opt.dataset, opt.arch, opt.size)
+model_name += "optim-{}_lr-{}_scheduler-{}".format(opt.optim, opt.lr, opt.scheduler)
 if opt.version: model_name += "_v-{}".format(opt.version)
 
 if opt.wandb_entity: wandb.init(entity = opt.wandb_entity, project = opt.dataset, config = opt, name = model_name)
