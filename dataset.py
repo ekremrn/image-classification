@@ -13,32 +13,32 @@ class CustomDataset(Dataset):
 
     def __init__(self, root, dataset, transform, train = True):
         
-        path = os.path.join(root, dataset)
+        self.path = os.path.join(root, dataset)
 
         csv = 'train.csv' if train else 'test.csv'
 
-        self.data = pd.read_csv( os.path.join(path, csv) )
-        self.classes = open(os.path.join(path, "classes.txt"), 'r').read().splitlines()
+        self.data = pd.read_csv( os.path.join(self.path, csv) )
+        self.classes = open(os.path.join(self.path, "classes.txt"), 'r').read().splitlines()
         
         self.transform = transform
         self.num_classes = len(self.classes)
 
 
-        def __len__(self):
-            return len(self.data)
+    def __len__(self):
+        return len(self.data)
         
 
-        def __getitem__(self, idx):
+    def __getitem__(self, idx):
 
-            img_path = os.path.join(self.data_dir, self.data.iloc[idx, 0])
-            label_name = self.data.iloc[idx, 1]
-            # X
-            image = cv2.imread(img_path)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            image = self.transform(image = image)["image"]            
-            # Y
-            label = self.classes.index(label_name)
-            return image, label
+        img_path = os.path.join(self.path, self.data.iloc[idx, 0])
+        label_name = self.data.iloc[idx, 1]
+        # X
+        image = cv2.imread(img_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = self.transform(image = image)["image"]            
+        # Y
+        label = self.classes.index(label_name)
+        return image, label
 
 
 #
@@ -84,6 +84,11 @@ def get_transforms(size, aug_mode):
         A.RandomResizedCrop(size, size),
         A.HorizontalFlip(0.5)])
 
+    if aug_mode == 'special':
+        train_tr.extend([
+            
+        ])
+
     if aug_mode == 'big':
         train_tr.extend([            
             A.ImageCompression(quality_lower = 50, quality_upper = 100),
@@ -124,7 +129,7 @@ def get(root, dataset, transforms, batch_size):
                                 train = True, transform = transforms['train'])
         testset = CustomDataset(root = root, dataset = dataset, 
                                 train = False, transform = transforms['test'])
-        num_classes = trainset['num_classes']
+        num_classes = trainset.num_classes
     
     trainloader = DataLoader(trainset, batch_size = batch_size, shuffle = True)
 
