@@ -77,37 +77,34 @@ def get_transforms(size, aug_mode):
     # Different Archs?
     mean_std = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
 
-    train_tr = []
-
-
     if aug_mode == 'min':
-        train_tr.extend([
+        train_tr = [
         A.Resize(size, size),
         A.HorizontalFlip(0.5)
-        ])
+        ]
 
     if aug_mode == 'special':
-        train_tr.extend([
+        train_tr = [
         A.Resize(size, size),
 
         # Weather situations
         A.RandomSunFlare(p=0.25),
-        A.RandomShadow(p=0.25),
-        A.RandomFog(p=0.25),
         A.RandomRain(p=0.25),
+        #A.RandomShadow(p=0.25), 
+        #A.RandomFog(p=0.25),
         
         # Rotation 
-        A.HorizontalFlip(p=0.25),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.25),
         A.ShiftScaleRotate(p=0.25),
 
         # Color
         A.ChannelShuffle(p=0.25),
         A.RandomBrightnessContrast(p=0.25)
-
-        ])
+        ]
 
     if aug_mode == 'big':
-        train_tr.extend([      
+        train_tr = [   
             A.RandomResizedCrop(size, size),
             A.HorizontalFlip(0.5),      
             A.ImageCompression(quality_lower = 50, quality_upper = 100),
@@ -117,7 +114,7 @@ def get_transforms(size, aug_mode):
             A.transforms.CLAHE(clip_limit = 4.0, tile_grid_size = (8, 8), p = 0.5),
             A.transforms.HueSaturationValue(hue_shift_limit = 20, sat_shift_limit = 30, val_shift_limit = 20, p = 0.5),
             A.RandomBrightnessContrast(p=0.3)
-        ])
+        ]
 
     train_tr.extend([A.Normalize(*mean_std), A.pytorch.transforms.ToTensorV2()])
 
