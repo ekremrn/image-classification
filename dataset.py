@@ -1,8 +1,9 @@
 import os
-import cv2
+import numpy as np
 import pandas as pd
 import albumentations as A
 
+from PIL import Image
 from albumentations import pytorch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets
@@ -33,9 +34,8 @@ class CustomDataset(Dataset):
         img_path = os.path.join(self.path, self.data.iloc[idx, 0])
         label_name = self.data.iloc[idx, 1]
         # X
-        image = cv2.imread(img_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = self.transform(image = image)["image"]            
+        image = Image.open(image)
+        image = self.transform(image = np.array(image))["image"]            
         # Y
         label = self.classes.index(label_name)
         return image, label
