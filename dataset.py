@@ -3,16 +3,18 @@ import numpy as np
 import pandas as pd
 import albumentations as A
 
-from PIL import Image
+from PIL import Image, ImageFile
 from albumentations import pytorch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets
+
 
 
 #
 class CustomDataset(Dataset):
 
     def __init__(self, root, dataset, transform, train = True):
+        ImageFile.LOAD_TRUNCATED_IMAGES = True
         
         self.path = os.path.join(root, dataset)
 
@@ -27,14 +29,15 @@ class CustomDataset(Dataset):
 
     def __len__(self):
         return len(self.data)
-        
+
 
     def __getitem__(self, idx):
 
         img_path = os.path.join(self.path, self.data.iloc[idx, 0])
         label_name = self.data.iloc[idx, 1]
         # X
-        image = Image.open(image)
+        img = Image.open(img_path)
+        image = img.convert('RGB') if len(img.size) == 2 else img
         image = self.transform(image = np.array(image))["image"]            
         # Y
         label = self.classes.index(label_name)
