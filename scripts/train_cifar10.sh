@@ -3,36 +3,11 @@ python3 train.py --root data \
                  --save_path results \
                  --epoch 25 \
                  --size 32 \
-                 --batch_size 64 \
-                 --aug_mode min \
+                 --batch_size 256 \
+                 --aug_mode special \
                  --arch resnet50 \
-                 --wandb_entity ekrem-rn \
+                 --lr 0.005 \
+                 --lr_milestones 5 10 15 20 \
+                 --scheduler_gamma 0.5 \
                  --version 0.1
-
-
-python3 train.py --root data \
-                 --dataset CIFAR10 \
-                 --save_path results \
-                 --epoch 25 \
-                 --size 32 \
-                 --batch_size 64 \
-                 --aug_mode big \
-                 --arch resnet50 \
-                 --wandb_entity ekrem-rn \
-                 --version 0.2
-
-
-python3 train.py --root data \
-                 --dataset CIFAR10 \
-                 --save_path results \
-                 --epoch 25 \
-                 --size 32 \
-                 --batch_size 64 \
-                 --aug_mode big \
-                 --arch resnet50 \
-                 --lr 0.001 \
-                 --wandb_entity ekrem-rn \
-                 --version 0.3
-
-
 
