@@ -86,7 +86,22 @@ def get_transforms(size, aug_mode):
 
     if aug_mode == 'special':
         train_tr.extend([
-            
+        A.Resize(size, size),
+
+        # Weather situations
+        A.RandomSunFlare(p=0.25),
+        A.RandomShadow(p=0.25),
+        A.RandomFog(p=0.25),
+        A.RandomRain(p=0.25),
+        
+        # Rotation 
+        A.HorizontalFlip(p=0.25),
+        A.ShiftScaleRotate(p=0.25),
+
+        # Color
+        A.ChannelShuffle(p=0.25),
+        A.RandomBrightnessContrast(p=0.25)
+
         ])
 
     if aug_mode == 'big':
