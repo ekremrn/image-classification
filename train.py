@@ -30,7 +30,6 @@ opt = parameters.get()
 
 #LOG
 model_name = "ds-{}_md-{}_in-{}".format(opt.dataset, opt.arch, opt.size)
-model_name += "_optim-{}_lr-{}_scheduler-{}".format(opt.optim, opt.lr, opt.scheduler)
 if opt.version: model_name += "_v-{}".format(opt.version)
 
 if opt.wandb_entity: wandb.init(entity = opt.wandb_entity, project = opt.dataset, config = opt, name = model_name)
@@ -49,7 +48,8 @@ STDOUTHANDLER = logging.StreamHandler()
 logging.basicConfig(level = logging.INFO, 
                     format = FORMATTER, 
                     handlers = [FILEHANDLER, STDOUTHANDLER])
-
+for arg, value in sorted(vars(opt).items()):
+    logging.info("{}: {}".format(arg, value))
 
 #SEED
 torch.backends.cudnn.deterministic = True
