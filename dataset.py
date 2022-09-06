@@ -86,7 +86,56 @@ def get_transforms(size, aug_mode):
         A.HorizontalFlip(0.5)
         ]
 
-    if aug_mode == 'special':
+    elif aug_mode == 'standart':
+        train_tr = [
+        A.Resize(size, size),
+        A.HorizontalFlip(p=0.5),
+
+        A.OneOf([
+            A.RandomCrop(size, size, p=0.2),
+            A.ShiftScaleRotate(p=0.2),
+            A.RandomBrightnessContrast(p=0.2),
+        ], p=0.2),
+
+        # Noise
+        A.OneOf([
+            A.IAAAdditiveGaussianNoise(),
+            A.GaussNoise(),
+        ], p=0.3),
+
+        # Blur
+        A.OneOf([
+            A.MotionBlur(p=0.3),
+            A.MedianBlur(blur_limit=3, p=0.3),
+            A.Blur(blur_limit=3, p=0.3),
+        ], p=0.3),
+
+        # Distortion
+        A.OneOf([
+            A.OpticalDistortion(p=0.3),
+            A.GridDistortion(p=0.3),
+            A.IAAPiecewiseAffine(p=0.3),
+        ], p=0.3),
+
+        # Color
+        A.OneOf([
+            A.CLAHE(clip_limit=2),
+            A.IAASharpen(),
+            A.IAAEmboss(),
+            A.RandomBrightnessContrast(),            
+        ], p=0.3),
+
+        # Weather
+        A.OneOf([
+            A.RandomSunFlare(p=0.3),
+            A.RandomRain(p=0.3),        
+        ], p=0.3),
+
+        A.HueSaturationValue(p=0.3),
+
+        ]
+
+    elif aug_mode == 'special':
         train_tr = [
         A.Resize(size, size),
 
@@ -104,19 +153,6 @@ def get_transforms(size, aug_mode):
         # Color
         A.ChannelShuffle(p=0.25),
         A.RandomBrightnessContrast(p=0.25)
-        ]
-
-    if aug_mode == 'big':
-        train_tr = [   
-            A.RandomResizedCrop(size, size),
-            A.HorizontalFlip(0.5),      
-            A.ImageCompression(quality_lower = 50, quality_upper = 100),
-            A.ShiftScaleRotate(shift_limit = 0.2, scale_limit = 0.2, rotate_limit = 10, border_mode = 0, p = 0.5),
-            A.Cutout(max_h_size = int(size * 0.4), max_w_size = int(size * 0.4), num_holes = 1, p = 0.5),
-            A.transforms.CoarseDropout(max_holes = 16, max_height = 16, max_width = 16, p = 0.5),
-            A.transforms.CLAHE(clip_limit = 4.0, tile_grid_size = (8, 8), p = 0.5),
-            A.transforms.HueSaturationValue(hue_shift_limit = 20, sat_shift_limit = 30, val_shift_limit = 20, p = 0.5),
-            A.RandomBrightnessContrast(p=0.3)
         ]
 
     train_tr.extend([A.Normalize(*mean_std), A.pytorch.transforms.ToTensorV2()])
