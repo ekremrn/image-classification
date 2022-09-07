@@ -18,29 +18,28 @@ classes_path = os.path.join(opt.path, "classes.txt")
 
 
 #
-category_paths = [os.path.join(opt.path, folder)
-                 for folder in os.listdir(opt.path)
-                 if os.path.isdir(os.path.join(opt.path, folder))]
+category_names = [category
+                 for category in os.listdir(opt.path)
+                 if os.path.isdir(os.path.join(opt.path, category))]
 
 
 #
 X, Y = [], []
-for category_path in category_paths:
+for category_name in category_names:
 
-        class_paths = [os.path.join(category_path, class_path)
-                           for class_path in os.listdir(category_path)
-                           if os.path.isdir(os.path.join(category_path, class_path))]
+        class_names = [class_name
+                       for class_name in os.listdir(os.path.join(opt.path, category_name))
+                       if os.path.isdir(os.path.join(opt.path, category_name, class_name))]
         
-        for class_path in class_paths:
-            category = class_path.split("/")[-1]
+        for class_name in class_names:
 
-            imgs_paths = [os.path.join(class_path, img_name) 
-                          for img_name in os.listdir(class_path)
+            imgs_paths = [os.path.join(category_name, class_name, img_name) 
+                          for img_name in os.listdir(os.path.join(opt.path, category_name, class_name))
                           if img_name.endswith("jpg") or img_name.endswith("jpeg")]
             
             for img_path in imgs_paths:
                 X.append(img_path)
-                Y.append(category)
+                Y.append(category_name)
 
 df = pd.DataFrame(data = {'image_name': X, 'category_name': Y} )
 
@@ -56,3 +55,4 @@ pd.DataFrame(data = d).to_csv(test_csv_path, index = False)
 with open(classes_path, 'w') as output:
     for row in sorted(df['category_name'].unique()): 
         output.write(str(row) + '\n')
+        
