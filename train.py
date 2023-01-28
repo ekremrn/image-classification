@@ -109,10 +109,16 @@ else:
     raise Exception("Optimizer <{}> not available!".format(opt.optim))
 
 ##SCHEDULER
-if opt.scheduler != "none":
+if opt.scheduler == "step":
     scheduler = optim.lr_scheduler.MultiStepLR(
-        optimizer, milestones=opt.lr_milestones, gamma=opt.scheduler_gamma
+        optimizer.base_optimizer if opt.optim == 'sam' else optimizer, 
+        milestones=opt.lr_milestones, gamma=opt.scheduler_gamma
     )
+elif opt.scheduler == 'cosine':
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(
+        optimizer.base_optimizer if opt.optim == 'sam' else optimizer, 
+        T_max = opt.epoch, eta_min = opt.min_lr)
+
 
 
 # TRAIN
