@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 #
 parser = argparse.ArgumentParser()
 parser.add_argument('--path', required = True, type = str)
+parser.add_argument('--test_size', default = 0.3, type = float)
 opt = parser.parse_args()
 
 
@@ -39,12 +40,11 @@ for category_name in category_names:
             
             for img_path in imgs_paths:
                 X.append(img_path)
-                Y.append(category_name)
+                Y.append(class_name)
 
 df = pd.DataFrame(data = {'image_name': X, 'category_name': Y} )
 
-X_train, X_test, y_train, y_test = train_test_split(df['image_name'], df['category_name'], test_size = 0.20, random_state = 42, shuffle = True)
-X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size = 0.1, random_state = 42, shuffle = True)
+X_train, X_test, y_train, y_test = train_test_split(df['image_name'], df['category_name'], test_size = opt.test_size, random_state = 42, shuffle = True)
 
 d = {'image_name': X_train, 'category_name': y_train}
 pd.DataFrame(data = d).to_csv(train_csv_path, index = False)
