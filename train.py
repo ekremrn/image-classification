@@ -127,14 +127,21 @@ for epoch in range(opt.epoch):  # loop over the dataset multiple times
         inputs, labels = data
         inputs, labels = inputs.to(opt.device), labels.to(opt.device)
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
-
         # forward + backward + optimize
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
-        optimizer.step()
+
+        if opt.optim == "sam":
+            optimizer.first_step(zero_grad=True)
+            loss_ = criterion(model(inputs), labels)
+            loss_.backward()
+            optimizer.second_step(zero_grad=True)
+        else:
+            optimizer.step()
+
+        # zero the parameter gradients
+        optimizer.zero_grad()
 
         # statistics
         running_loss += loss.item()
