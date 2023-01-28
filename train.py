@@ -87,8 +87,7 @@ opt.classes = (
 )
 
 # ARCHITECTURE
-model = architecture.get(opt.arch, opt.not_pretrained, opt.num_classes)
-model.to(opt.device)
+model = architecture.get(opt.arch, opt.not_pretrained, opt.num_classes, opt.device)
 
 
 # LOSS FUNCTION AND OPTIMIZER
