@@ -74,17 +74,6 @@ torch.manual_seed(opt.seed)
 torch.cuda.manual_seed(opt.seed)
 torch.cuda.manual_seed_all(opt.seed)
 
-# MODEL CONFIG SAVE
-model_config_dict = {
-    "dataset": opt.dataset,
-    "size": opt.size,
-    "arch": opt.arch,
-    "pretrained": opt.not_pretrained,
-    "classes": opt.classes,
-}
-with open(os.path.join(opt.save_path, "config.json"), "w") as outfile:
-    json.dump(model_config_dict, outfile)
-
 # DATASET
 transforms = dataset.get_transforms(opt.size, aug_mode=opt.aug_mode)
 dataloaders = dataset.get(
@@ -96,6 +85,17 @@ opt.classes = (
     if hasattr(dataloaders["training"].dataset, "classes")
     else []
 )
+
+# MODEL CONFIG SAVE
+model_config_dict = {
+    "dataset": opt.dataset,
+    "size": opt.size,
+    "arch": opt.arch,
+    "pretrained": opt.not_pretrained,
+    "classes": opt.classes,
+}
+with open(os.path.join(opt.save_path, "config.json"), "w") as outfile:
+    json.dump(model_config_dict, outfile)
 
 # ARCHITECTURE
 model = architecture.get(opt.arch, opt.not_pretrained, opt.num_classes, opt.device)
@@ -122,14 +122,14 @@ else:
 if opt.scheduler == "step":
     scheduler = optim.lr_scheduler.MultiStepLR(
         optimizer.base_optimizer if opt.optim == "sam" else optimizer,
-        milestones=opt.lr_milestones,
-        gamma=opt.scheduler_gamma,
+        milestones=opt.step_lr_milestones,
+        gamma=opt.step_scheduler_gamma,
     )
 elif opt.scheduler == "cosine":
     scheduler = optim.lr_scheduler.CosineAnnealingLR(
         optimizer.base_optimizer if opt.optim == "sam" else optimizer,
         T_max=opt.epoch,
-        eta_min=opt.min_lr,
+        eta_min=opt.cosine_min_lr,
     )
 
 
