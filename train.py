@@ -1,6 +1,7 @@
 # LIBRARIES
 ##
 import os
+import json
 import random
 import numpy as np
 from tqdm import tqdm
@@ -73,6 +74,16 @@ torch.manual_seed(opt.seed)
 torch.cuda.manual_seed(opt.seed)
 torch.cuda.manual_seed_all(opt.seed)
 
+# MODEL CONFIG SAVE
+model_config_dict = {
+    "dataset": opt.dataset,
+    "size": opt.size,
+    "arch": opt.arch,
+    "pretrained": opt.not_pretrained,
+    "classes": opt.classes,
+}
+with open(os.path.join(opt.save_path, "config.json"), "w") as outfile:
+    json.dump(model_config_dict, outfile)
 
 # DATASET
 transforms = dataset.get_transforms(opt.size, aug_mode=opt.aug_mode)
@@ -101,7 +112,7 @@ if opt.optim == "adam":
     optimizer = optim.Adam(model.parameters(), lr=opt.lr)
 elif opt.optim == "sgd":
     optimizer = optim.SGD(model.parameters(), lr=opt.lr, momentum=opt.momentum)
-elif opt.optim == "sam":  # Does not work ??
+elif opt.optim == "sam":
     base_optimizer = optim.SGD
     optimizer = SAM(model.parameters(), base_optimizer, opt.lr, momentum=opt.momentum)
 else:
@@ -110,14 +121,16 @@ else:
 ##SCHEDULER
 if opt.scheduler == "step":
     scheduler = optim.lr_scheduler.MultiStepLR(
-        optimizer.base_optimizer if opt.optim == 'sam' else optimizer, 
-        milestones=opt.lr_milestones, gamma=opt.scheduler_gamma
+        optimizer.base_optimizer if opt.optim == "sam" else optimizer,
+        milestones=opt.lr_milestones,
+        gamma=opt.scheduler_gamma,
     )
-elif opt.scheduler == 'cosine':
+elif opt.scheduler == "cosine":
     scheduler = optim.lr_scheduler.CosineAnnealingLR(
-        optimizer.base_optimizer if opt.optim == 'sam' else optimizer, 
-        T_max = opt.epoch, eta_min = opt.min_lr)
-
+        optimizer.base_optimizer if opt.optim == "sam" else optimizer,
+        T_max=opt.epoch,
+        eta_min=opt.min_lr,
+    )
 
 
 # TRAIN
